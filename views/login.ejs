@@ -1,12 +1,14 @@
-<%- include('header') %>
+<%- include('header') %>  
 
-<h2>Login</h2>
-<form method="POST" action="/login" class="form">
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="password" name="password" placeholder="Contraseña" required>
-    <button type="submit">Iniciar sesión</button>
-</form>
+<div class="container">
+    <h2>Login</h2>
+    <form method="POST" action="/login" class="form">
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Contraseña" required>
+        <button type="submit">Iniciar sesión</button>
+    </form>
 
-<p>¿No tienes una cuenta? <a href="/register">Regístrate aquí</a></p>
+    <p>¿No tienes una cuenta? <a href="/register">Regístrate aquí</a></p>
+</div>
 
-<%- include('footer') %>
+<%- include('footer') %> 
