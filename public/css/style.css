@@ -199,9 +199,8 @@ header ul li a:hover::after {
 /* Footer */
 footer {
     background-color: var(--color-text-dark);
-    color: var(--color-text-light); 
+    color: var(--color-white); 
     text-align: center;
-    padding: 20px 0; 
     margin-top: auto;
     box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3); 
     font-size: 0.9em;

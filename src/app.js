@@ -1,9 +1,8 @@
-// app.js
-
 const express = require('express');
 const app = express();
 const port = 3000;
 const path = require('path');
+const generatePassword = require('generate-password');
 
 
 app.set('view engine', 'ejs');
@@ -15,37 +14,66 @@ app.use('/public', express.static(path.join(__dirname, '..', 'public')));
 app.use(express.urlencoded({ extended: true }));
 
 
-// LOGIN
 app.get('/login', (req, res) => {
     res.render('login', { user: undefined });
 });
 
-// REGISTRO
+
 app.get('/register', (req, res) => {
     res.render('register', { user: undefined });
 });
 
-// Ruta POST para manejar el login (ejemplo básico)
+
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
     console.log(`Intento de Login: Email - ${email}, Contraseña - ${password}`);
-    res.send('Login exitoso (esto es un placeholder)');
+    res.render('dashboard', { user: { email } });
 });
 
-// Ruta POST para manejar el registro (ejemplo básico)
+
 app.post('/register', (req, res) => {
-    const { username, email, password, confirmPassword } = req.body;
+    const {username, email, password, confirmPassword} = req.body;
     console.log(`Intento de Registro: Usuario - ${username}, Email - ${email}, Contraseña - ${password}`);
-    res.send('Registro exitoso (esto es un placeholder)');
+    res.redirect('/login');
 });
 
-// Redireccionar al login
+
 app.get('/', (req, res) => {
     res.redirect('/login');
 });
 
-// Iniciar el servidor
-app.listen(port, () => {
-    console.log(`Servidor escuchando en http://localhost:${port}`);
-    console.log('Accede al login en http://localhost:3000/login');
+app.get('/dashboard', (req, res) => {
+    res.render('dashboard', { user: undefined });
 });
+
+app.get('/add_password', (req, res) => {
+    res.render('add_password', { password: null });
+});
+
+app.post('/add_password', (req, res) => {
+    const {name, user, password, comment} = req.body;
+    console.log(`Nueva contraseña añadida: ${name}, ${user}, ${password}, ${comment}`);
+    res.redirect('/dashboard');
+});
+
+app.get('/gen_password', (req, res) => {
+    res.render('gen_password', { password: null });
+});
+
+app.post('/gen_password', (req, res) => {
+    const { length, numeric, uppercase, lowercase, special } = req.body;
+
+    const genPassword = generatePassword.generate({
+        length: parseInt(length),
+        numbers: !!numeric,
+        uppercase: !!uppercase,
+        lowercase: !!lowercase,
+        symbols: !!special,
+        excludeSimilarCharacters: true
+    });
+
+    res.render('add_password', {password: genPassword});
+});
+
+
+module.exports = app;
