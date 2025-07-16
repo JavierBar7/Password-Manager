@@ -3,6 +3,7 @@ const app = express();
 const port = 3000;
 const path = require('path');
 const generatePassword = require('generate-password');
+const fs = require('fs');
 
 
 app.set('view engine', 'ejs');
@@ -53,6 +54,24 @@ app.get('/add_password', (req, res) => {
 app.post('/add_password', (req, res) => {
     const {name, user, password, comment} = req.body;
     console.log(`Nueva contraseña añadida: ${name}, ${user}, ${password}, ${comment}`);
+    
+    const csvLine = `${name},${user},${password},${comment}\n`;
+    const csvFilePath = path.join(__dirname, '..', 'data', 'credenciales.csv');
+
+    if (!fs.existsSync(csvFilePath)) {
+        const headers = 'Nombre,Usuario,Contraseña,Comentario\n';
+        fs.writeFileSync(csvFilePath, headers, 'utf8');
+    }
+
+    fs.appendFile(csvFilePath, csvLine, (err) => {
+        if (err) {
+            console.error('Error al guardar en CSV:', err);
+        } else {
+            console.log('Credencial guardada en CSV');
+        }
+    });
+
+
     res.redirect('/dashboard');
 });
 

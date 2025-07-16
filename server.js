@@ -3,6 +3,7 @@ const ejs = require('ejs');
 const app = require('./src/app');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const fs = require('fs');
 const path = require('path');
 const generator= require('generate-password');
 
