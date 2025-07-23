@@ -4,19 +4,48 @@ const port = 3000;
 const path = require('path');
 const generatePassword = require('generate-password');
 const fs = require('fs');
-
-
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, '..', 'views'));
-
-
-app.use('/public', express.static(path.join(__dirname, '..', 'public'))); 
+const pool = require('./config/db');
+const bcrypt = require('bcryptjs');
 
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '..', 'views'));
+app.use('/public', express.static(path.join(__dirname, '..', 'public'))); 
 
 
 app.get('/login', (req, res) => {
     res.render('login', { user: undefined });
+});
+
+
+app.post('/register', async (req, res) => {
+  if (!req.body) {
+    return res.status(400).send('No data received');
+  }
+  const { email, password, confirmPassword } = req.body;
+
+  if (password !== confirmPassword) {
+    return res.send('Passwords do not match');
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const query = 'INSERT INTO users (email, password) VALUES ($1, $2)';
+    await pool.query(query, [email, hashedPassword]);
+
+    console.log(`User registered: ${email}`);
+    res.redirect('/login');
+  } catch (err) {
+    console.error('Registration error:', err);
+
+    if (err.code === '23505') {  // Código de error para violación de UNIQUE en PostgreSQL
+      return res.send('Error: This email is already registered.');
+    }
+
+    res.send('Registration failed: ' + err.message);
+  }
 });
 
 
@@ -31,12 +60,6 @@ app.post('/login', (req, res) => {
     res.render('dashboard', { user: { email } });
 });
 
-
-app.post('/register', (req, res) => {
-    const {username, email, password, confirmPassword} = req.body;
-    console.log(`Intento de Registro: Usuario - ${username}, Email - ${email}, Contraseña - ${password}`);
-    res.redirect('/login');
-});
 
 
 app.get('/', (req, res) => {
